@@ -1,9 +1,8 @@
 import asyncio
 import ipaddress
 import socket
-import ssl
 from functools import lru_cache, wraps
-from typing import Any, Awaitable, Callable, Coroutine, Literal, T
+from typing import Any, Awaitable, Callable, Coroutine, Literal, T, Tuple
 
 import httpx
 
@@ -81,22 +80,18 @@ class AsyncSecureTransport(httpx.AsyncHTTPTransport):
         self.verified_ip = verified_ip
         super().__init__()
 
-    async def connect(
+    async def handle_async_request(
         self,
-        hostname: str,
-        port: int,
-        _timeout: float | None = None,
-        ssl_context: ssl.SSLContext | None = None,
-        **_kwargs: Any,
-    ):
-        loop = asyncio.get_event_loop()
-        sock = await loop.getaddrinfo(self.verified_ip, port)
-        sock = socket.socket(sock[0][0], sock[0][1])
-        await loop.sock_connect(sock, (self.verified_ip, port))
-        if ssl_context:
-            sock = ssl_context.wrap_socket(sock, server_hostname=hostname)
-        return sock
+        request: httpx.Request
+    ) -> Tuple[int, bytes, bytes, httpx.Headers]:
+        original_url = request.url
+        if original_url.scheme != "https":
+            original_host = original_url.host
+            new_url = original_url.copy_with(host=self.verified_ip)
+            request.url = new_url
+            request.headers['Host'] = original_host
 
+        return await super().handle_async_request(request)
 
 async def get(
     url: str,
