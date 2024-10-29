@@ -85,12 +85,11 @@ class AsyncSecureTransport(httpx.AsyncHTTPTransport):
         request: httpx.Request
     ) -> Tuple[int, bytes, bytes, httpx.Headers]:
         original_url = request.url
-        if original_url.scheme != "https":
-            original_host = original_url.host
-            new_url = original_url.copy_with(host=self.verified_ip)
-            request.url = new_url
-            request.headers['Host'] = original_host
-
+        original_host = original_url.host
+        new_url = original_url.copy_with(host=self.verified_ip)
+        request.url = new_url
+        request.headers['Host'] = original_host
+        request.extensions = {"sni_hostname": original_host}
         return await super().handle_async_request(request)
 
 async def get(
