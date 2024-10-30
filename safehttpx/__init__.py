@@ -37,7 +37,7 @@ def lru_cache_async(maxsize: int = 256):
     return decorator
 
 
-@lru_cache_async
+@lru_cache_async()
 async def async_resolve_hostname_google(hostname: str) -> list[str]:
     async with httpx.AsyncClient() as client:
         try:
