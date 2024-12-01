@@ -15,7 +15,14 @@ Server Side Request Forgery (SSRF) attacks can be particularly dangerous as they
 ```bash
 $ pip install safehttpx
 ```
-
+Also avalaible through Conda
+```bash
+$ conda install safehttpx -c conda-forge
+```
+or
+```bash
+$ mamba install safehttpx -c conda-forge
+```
 ### Basic Usage
 
 ```py
