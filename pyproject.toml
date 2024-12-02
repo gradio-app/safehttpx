@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "safehttpx"
-version = "0.1.1"
 description = "A small Python library created to help developers protect their applications from Server Side Request Forgery (SSRF) attacks."
 authors = [
     { name = "Abubakar Abid", email = "abubakar@hf.co" }
