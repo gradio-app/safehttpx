@@ -1,13 +1,18 @@
 import asyncio
 import ipaddress
+from pathlib import Path
 import socket
 from functools import lru_cache, wraps
 from typing import Any, Awaitable, Callable, Coroutine, Literal, T, Tuple
 
 import httpx
 
-__version__ = "0.1.1"
+def get_version():
+    version_file = Path(__file__).parent.parent / 'version.txt'
+    with open(version_file, 'r') as f:
+        return f.read().strip()
 
+__version__ = get_version() 
 
 def is_public_ip(ip: str) -> bool:
     try:
