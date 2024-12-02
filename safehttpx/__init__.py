@@ -8,7 +8,7 @@ from typing import Any, Awaitable, Callable, Coroutine, Literal, T, Tuple
 import httpx
 
 def get_version():
-    version_file = Path(__file__).parent.parent / 'version.txt'
+    version_file = Path(__file__).parent / 'version.txt'
     with open(version_file, 'r') as f:
         return f.read().strip()
 
