@@ -106,7 +106,8 @@ async def get(
 ) -> httpx.Response:
     """
     This is the main function that should be used to make async HTTP GET requests.
-    It will automatically use a secure transport for non-whitelisted domains.
+    It will automatically use a secure transport for non-whitelisted domains, unless
+    a proxy is set in the environment variables (HTTP_PROXY, HTTPS_PROXY, http_proxy, https_proxy).
 
     Parameters:
     - url (str): The URL to make a GET request to.
