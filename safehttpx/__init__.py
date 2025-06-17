@@ -131,10 +131,10 @@ async def get(
         transport = AsyncSecureTransport(verified_ip)
 
     proxy_mounts = {}
-    if http_proxy:= os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy"):
-        proxy_mounts["http://"] = http_proxy
-    if https_proxy:= os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy"):
-        proxy_mounts["https://"] = https_proxy
+    if http_proxy := os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy"):
+        proxy_mounts["http://"] = httpx.AsyncHTTPTransport(proxy=http_proxy)
+    if https_proxy := os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy"):
+        proxy_mounts["https://"] = httpx.AsyncHTTPTransport(proxy=https_proxy)
 
     async with httpx.AsyncClient(transport=transport, mounts=proxy_mounts or None) as client:
         return await client.get(url, follow_redirects=False, **kwargs)
