@@ -2,6 +2,7 @@ import asyncio
 import ipaddress
 from pathlib import Path
 import socket
+import os
 from functools import lru_cache, wraps
 from typing import Any, Awaitable, Callable, Coroutine, Literal, T, Tuple
 
@@ -26,6 +27,23 @@ def is_public_ip(ip: str) -> bool:
         )
     except ValueError:
         return False
+
+
+def matches_domain_whitelist(hostname: str, domain_whitelist: list[str]) -> bool:
+    if not hostname or not domain_whitelist:
+        return False
+    hostname = hostname.lower()
+    for domain in domain_whitelist:
+        if not domain:
+            continue
+        domain = domain.lower()
+        if domain.startswith('*.'):
+            suffix = domain[2:]
+            if hostname == suffix or hostname.endswith('.' + suffix):
+                return True
+        elif hostname == domain:
+            return True
+    return False
 
 
 def lru_cache_async(maxsize: int = 256):
@@ -105,11 +123,12 @@ async def get(
 ) -> httpx.Response:
     """
     This is the main function that should be used to make async HTTP GET requests.
-    It will automatically use a secure transport for non-whitelisted domains.
+    It will automatically use a secure transport for non-whitelisted domains, unless
+    a proxy is set in the environment variables (HTTP_PROXY, HTTPS_PROXY, http_proxy, https_proxy).
 
     Parameters:
     - url (str): The URL to make a GET request to.
-    - domain_whitelist (list[str] | None): A list of domains to whitelist, which will not use a secure transport.
+    - domain_whitelist (list[str] | None): A list of domains to whitelist, which will not use a secure transport. Supports wildcard subdomains with "*.domain.com" format (asterisk must be at the beginning).
     - _transport (httpx.AsyncBaseTransport | Literal[False] | None): A custom transport to use for the request. Takes precedence over domain_whitelist. Set to False to use no transport.
     - **kwargs: Additional keyword arguments to pass to the httpx.AsyncClient.get() function.
     """
@@ -122,7 +141,7 @@ async def get(
 
     if _transport:
         transport = _transport
-    elif _transport is False or hostname in domain_whitelist:
+    elif _transport is False or matches_domain_whitelist(hostname, domain_whitelist):
         transport = None
     else:
         verified_ip = await async_validate_url(hostname)
