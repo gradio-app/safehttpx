@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'version.txt'
+      - 'safehttpx/version.txt'
 
 jobs:
   publish:
