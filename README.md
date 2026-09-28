@@ -23,6 +23,14 @@ or
 ```bash
 $ mamba install safehttpx -c conda-forge
 ```
+
+> [!NOTE]
+> Starting with v0.2.0, `safehttpx` is built on [`httpx2`](https://github.com/pydantic/httpx2): it depends on `httpx2`, `safehttpx.get()` returns an `httpx2.Response`, and custom transports must be `httpx2` transports. If you need to use `httpx` instead, pin `safehttpx` to v0.1.7 or earlier:
+>
+> ```bash
+> $ pip install "safehttpx<=0.1.7"
+> ```
+
 ### Basic Usage
 
 ```py
