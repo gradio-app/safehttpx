@@ -9,14 +9,14 @@ authors = [
     { name = "Abubakar Abid", email = "abubakar@hf.co" }
 ]
 readme = "README.md"
-requires-python = ">3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "httpx",
+    "httpx2>=2.0.0,<3",
 ]
 dynamic = ["version"]
 
@@ -25,7 +25,7 @@ homepage = "https://github.com/gradio-app/safehttpx"
 repository = "https://github.com/gradio-app/safehttpx"
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "pytest-asyncio"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["safehttpx"]

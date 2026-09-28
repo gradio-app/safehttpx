@@ -1,6 +1,6 @@
 # safehttpx
 
-A small Python library created to help developers protect their applications from Server Side Request Forgery (SSRF) attacks. It implements an **asynchronous GET method** called `safehttpx.get()`, which is a wrapper around `httpx.AsyncClient.get()` while performing DNS validation on the supplied URL using [Google DNS](https://developers.google.com/speed/public-dns). 
+A small Python library created to help developers protect their applications from Server Side Request Forgery (SSRF) attacks. It implements an **asynchronous GET method** called `safehttpx.get()`, which is a wrapper around `httpx2.AsyncClient.get()` ([HTTPX2](https://github.com/pydantic/httpx2), the maintained fork of `httpx`) while performing DNS validation on the supplied URL using [Google DNS](https://developers.google.com/speed/public-dns). 
 
 It also implements mitigation for [DNS rebinding](https://en.wikipedia.org/wiki/DNS_rebinding) attacks.
 
@@ -64,9 +64,9 @@ await sh.get("https://huggingface.co", domain_whitelist=PUBLIC_HOSTNAME_WHITELIS
 ### Custom Transports (Advanced)
 
 If you know what you are doing, and what to pass in a custom instance of
-`httpx.AsyncBaseTransport`, you can use the `_transport` parameter in `sh.get()`. Setting
+`httpx2.AsyncBaseTransport`, you can use the `_transport` parameter in `sh.get()`. Setting
 this to `False` explicitly will use no secure transport (effectively 
-making `sh.get` equivalent to `httpx.AsyncClient.get()`).
+making `sh.get` equivalent to `httpx2.AsyncClient.get()`).
 
 ## More Information
 

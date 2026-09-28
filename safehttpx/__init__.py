@@ -6,7 +6,7 @@ import os
 from functools import lru_cache, wraps
 from typing import Any, Awaitable, Callable, Coroutine, Literal, T, Tuple
 
-import httpx
+import httpx2
 
 def get_version():
     version_file = Path(__file__).parent / 'version.txt'
@@ -62,7 +62,7 @@ def lru_cache_async(maxsize: int = 256):
 
 @lru_cache_async()
 async def async_resolve_hostname_google(hostname: str) -> list[str]:
-    async with httpx.AsyncClient() as client:
+    async with httpx2.AsyncClient() as client:
         try:
             response_v4 = await client.get(
                 f"https://dns.google/resolve?name={hostname}&type=A"
@@ -98,15 +98,15 @@ async def async_validate_url(hostname: str) -> str:
     raise ValueError(f"Hostname {hostname} failed validation")
 
 
-class AsyncSecureTransport(httpx.AsyncHTTPTransport):
+class AsyncSecureTransport(httpx2.AsyncHTTPTransport):
     def __init__(self, verified_ip: str):
         self.verified_ip = verified_ip
         super().__init__()
 
     async def handle_async_request(
         self,
-        request: httpx.Request
-    ) -> Tuple[int, bytes, bytes, httpx.Headers]:
+        request: httpx2.Request
+    ) -> Tuple[int, bytes, bytes, httpx2.Headers]:
         original_url = request.url
         original_host = original_url.host
         new_url = original_url.copy_with(host=self.verified_ip)
@@ -118,9 +118,9 @@ class AsyncSecureTransport(httpx.AsyncHTTPTransport):
 async def get(
     url: str,
     domain_whitelist: list[str] | None = None,
-    _transport: httpx.AsyncBaseTransport | Literal[False] | None = None,
+    _transport: httpx2.AsyncBaseTransport | Literal[False] | None = None,
     **kwargs,
-) -> httpx.Response:
+) -> httpx2.Response:
     """
     This is the main function that should be used to make async HTTP GET requests.
     It will automatically use a secure transport for non-whitelisted domains, unless
@@ -129,10 +129,10 @@ async def get(
     Parameters:
     - url (str): The URL to make a GET request to.
     - domain_whitelist (list[str] | None): A list of domains to whitelist, which will not use a secure transport. Supports wildcard subdomains with "*.domain.com" format (asterisk must be at the beginning).
-    - _transport (httpx.AsyncBaseTransport | Literal[False] | None): A custom transport to use for the request. Takes precedence over domain_whitelist. Set to False to use no transport.
-    - **kwargs: Additional keyword arguments to pass to the httpx.AsyncClient.get() function.
+    - _transport (httpx2.AsyncBaseTransport | Literal[False] | None): A custom transport to use for the request. Takes precedence over domain_whitelist. Set to False to use no transport.
+    - **kwargs: Additional keyword arguments to pass to the httpx2.AsyncClient.get() function.
     """
-    parsed_url = httpx.URL(url)
+    parsed_url = httpx2.URL(url)
     hostname = parsed_url.host
     if not hostname:
         raise ValueError(f"URL {url} does not have a valid hostname")
@@ -147,5 +147,5 @@ async def get(
         verified_ip = await async_validate_url(hostname)
         transport = AsyncSecureTransport(verified_ip)
 
-    async with httpx.AsyncClient(transport=transport) as client:
+    async with httpx2.AsyncClient(transport=transport) as client:
         return await client.get(url, follow_redirects=False, **kwargs)
